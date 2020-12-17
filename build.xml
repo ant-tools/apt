@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="apt" default="all">
+	<property file="d://lib/libraries.properties" />
+
+	<property name="NAME" value="js-apt" />
+	<property name="VERSION" value="1.0.1" />
+	<property name="BUILD" value="../build" />
+
+	<property name="JAR" value="${BUILD}/${NAME}-${VERSION}.jar" />
+	<property name="API" value="${BUILD}/api-doc/${NAME}" />
+
+	<property name="SRC" value="src" />
+	<property name="BIN" value="bin" />
+	<property name="SCRIPT-GEN-BIN" value="../script-gen/bin" />
+
+	<target name="all" depends="clean-all">
+		<antcall target="build-jar" />
+		<antcall target="generate-api-doc" />
+	</target>
+
+	<target name="build-jar">
+		<jar destfile="${JAR}">
+			<zipfileset dir="${BIN}" includes="js/tools/apt/*.class" />
+			<zipfileset dir="${SCRIPT-GEN-BIN}" includes="js/tools/script/gen/*" />
+			<zipfileset dir="${BIN}" includes="js/tools/apt/eclipse.manifest" fullpath="META-INF/services/javax.annotation.processing.Processor" />
+			<zipfileset src="${LIB-COMMONS-LANG}" excludes="META-INF" />
+			<zipfileset src="${LIB-COMMONS-COLLECTIONS}" excludes="META-INF" />
+			<zipfileset src="${LIB-VELOCITY}" excludes="META-INF" />
+		</jar>
+		<copy file="${JAR}" todir="${REPO}" />
+	</target>
+
+	<target name="generate-api-doc">
+		<delete dir="${API}" />
+		<javadoc destdir="${API}" private="yes">
+			<packageset dir="src">
+			</packageset>
+			<packageset dir="../script-gen/src">
+			</packageset>
+			<link href="http://docs.oracle.com/javase/6/docs/api/" />
+			<link href="http://docs.oracle.com/javase/6/docs/jdk/api/javadoc/doclet/" />
+			<link href="http://api.js-lib.com/server/" />
+		</javadoc>
+	</target>
+
+	<target name="clean-all">
+		<delete file="${JAR}" verbose="yes" failonerror="no" />
+		<delete includeemptydirs="true" verbose="yes" failonerror="no">
+			<fileset dir="${API}" />
+		</delete>
+	</target>
+</project>
